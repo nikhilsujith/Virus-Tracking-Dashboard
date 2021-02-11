@@ -1,23 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+
+import {useState, useEffect} from 'react'
+import {Cards, Chart, CountryPicker, Header} from './components'
+import styles from './App.module.css';
+import  { fetchData } from './service'
+import Particles from "react-tsparticles";
 
 function App() {
+
+  // To update geographical global data
+  const [data, setData] = useState([])
+
+  useEffect (() => {
+    let mounted = true;
+    fetchData().then(items => {if(mounted){setData(items)}})
+    return () => mounted = false;
+  }, [])
+
+
+  // To update country specific data
+  const [country, setCountry] = useState()
+  
+  const handleCountryChange = async (country ) => {
+    const fetchedData = await fetchData(country);
+    // return fetchedData
+    console.log(fetchedData);
+  }
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={styles.container}>
+      <Header />
+      <Cards data={data}/>  
+      <CountryPicker handleCountryChange={handleCountryChange}/>
+      <Chart />
     </div>
   );
 }
